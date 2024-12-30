@@ -38,6 +38,7 @@ const AuthPage = () => {
               },
             },
           }}
+          redirectTo="https://anarcho.live"
           providers={[]}
         />
       </div>
