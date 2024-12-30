@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserPlus, UserMinus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type CommunityCardProps = {
   community: {
@@ -12,15 +13,16 @@ type CommunityCardProps = {
     is_member: boolean;
   };
   onJoinLeave: (communityId: string, isJoining: boolean) => Promise<void>;
-  onSelect: (communityId: string) => void;
 };
 
-export const CommunityCard = ({ community, onJoinLeave, onSelect }: CommunityCardProps) => {
+export const CommunityCard = ({ community, onJoinLeave }: CommunityCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <Card
       key={community.id}
       className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-      onClick={() => onSelect(community.id)}
+      onClick={() => navigate(`/community/${community.id}`)}
     >
       <div
         className="h-48 bg-cover bg-center"

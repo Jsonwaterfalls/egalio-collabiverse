@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
+import CommunityPage from "./pages/Community";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Index />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/community/:id"
+            element={
+              <ProtectedRoute>
+                <CommunityPage />
               </ProtectedRoute>
             }
           />
