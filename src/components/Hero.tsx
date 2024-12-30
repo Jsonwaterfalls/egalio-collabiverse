@@ -33,7 +33,7 @@ export const Hero = () => {
           <div className="flex flex-col justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-egalio-purple via-egalio-teal to-egalio-coral">
-                Welcome to Egalio
+                Welcome to ANA
               </h1>
               <p className="max-w-[600px] text-zinc-500 md:text-xl dark:text-zinc-400 mx-auto">
                 A decentralized digital space for human-AI collaboration, cooperation, and mutual aid
