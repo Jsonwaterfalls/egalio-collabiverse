@@ -9,7 +9,7 @@ const AuthPage = () => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (session) {
           navigate("/");
         }
@@ -40,13 +40,19 @@ const AuthPage = () => {
           }}
           redirectTo="https://anarcho.live"
           providers={[]}
-          view="sign_in"
+          magicLink={false}
           showLinks={true}
           localization={{
             variables: {
+              sign_up: {
+                email_label: 'Email',
+                password_label: 'Password',
+                button_label: 'Sign up',
+              },
               sign_in: {
                 email_label: 'Email',
                 password_label: 'Password',
+                button_label: 'Sign in',
               },
             },
           }}
