@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CreateCommunityDialog } from "./CreateCommunityDialog";
 import { UserPlus, UserMinus } from "lucide-react";
+import { DiscussionBoard } from "./DiscussionBoard";
 
 type Community = {
   id: string;
@@ -18,6 +19,7 @@ type Community = {
 export const Communities = () => {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCommunity, setSelectedCommunity] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchCommunities = async () => {
@@ -161,7 +163,8 @@ export const Communities = () => {
           {communities.map((community) => (
             <Card
               key={community.id}
-              className="overflow-hidden hover:shadow-xl transition-shadow"
+              className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+              onClick={() => setSelectedCommunity(community.id)}
             >
               <div
                 className="h-48 bg-cover bg-center"
@@ -181,9 +184,10 @@ export const Communities = () => {
               <CardContent className="space-y-4">
                 <p className="text-sm text-zinc-600">{community.description}</p>
                 <Button
-                  onClick={() =>
-                    handleJoinLeave(community.id, !community.is_member)
-                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleJoinLeave(community.id, !community.is_member);
+                  }}
                   variant={community.is_member ? "destructive" : "default"}
                   className="w-full"
                 >
@@ -203,6 +207,11 @@ export const Communities = () => {
             </Card>
           ))}
         </div>
+        {selectedCommunity && (
+          <div className="mt-8">
+            <DiscussionBoard communityId={selectedCommunity} />
+          </div>
+        )}
       </div>
     </section>
   );
