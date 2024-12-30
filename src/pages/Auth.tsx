@@ -31,7 +31,7 @@ const AuthPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-egalio-purple/10 via-egalio-teal/10 to-egalio-coral/10">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-xl">
         <h1 className="text-2xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-egalio-purple via-egalio-teal to-egalio-coral">
-          Welcome to Egalio
+          Welcome to ANA
         </h1>
         <Auth
           supabaseClient={supabase}
