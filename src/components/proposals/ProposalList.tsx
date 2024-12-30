@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateProposalDialog } from "./CreateProposalDialog";
+import { ProposalVoting } from "./ProposalVoting";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -16,9 +17,14 @@ type Proposal = {
   created_by: string;
 };
 
+type Vote = {
+  vote_type: string;
+};
+
 export const ProposalList = ({ communityId }: { communityId: string }) => {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userVotes, setUserVotes] = useState<Record<string, string>>({});
 
   const fetchProposals = async () => {
     try {
@@ -30,6 +36,22 @@ export const ProposalList = ({ communityId }: { communityId: string }) => {
 
       if (error) throw error;
       setProposals(data || []);
+
+      // Fetch user's votes
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: votes, error: votesError } = await supabase
+          .from("proposal_votes")
+          .select("proposal_id, vote_type")
+          .eq("voter_id", user.id);
+
+        if (votesError) throw votesError;
+        const votesMap = (votes || []).reduce((acc: Record<string, string>, vote: any) => {
+          acc[vote.proposal_id] = vote.vote_type;
+          return acc;
+        }, {});
+        setUserVotes(votesMap);
+      }
     } catch (error: any) {
       toast.error("Error fetching proposals");
       console.error("Error:", error.message);
@@ -59,8 +81,26 @@ export const ProposalList = ({ communityId }: { communityId: string }) => {
       )
       .subscribe();
 
+    // Subscribe to vote changes
+    const votesChannel = supabase
+      .channel("votes-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "proposal_votes",
+        },
+        () => {
+          console.log("Votes changed, refreshing...");
+          fetchProposals();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(votesChannel);
     };
   }, [communityId]);
 
@@ -90,9 +130,13 @@ export const ProposalList = ({ communityId }: { communityId: string }) => {
               <p className="text-sm text-muted-foreground mb-4">
                 {proposal.description}
               </p>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground mb-4">
                 Votes required: {proposal.votes_required}
               </div>
+              <ProposalVoting
+                proposalId={proposal.id}
+                currentVote={userVotes[proposal.id]}
+              />
             </CardContent>
           </Card>
         ))}
