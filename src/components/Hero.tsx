@@ -1,7 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleGetStarted = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/auth");
+    } else {
+      toast({
+        title: "Welcome back!",
+        description: "You're already logged in. Explore communities below!",
+      });
+    }
+  };
+
+  const handleLearnMore = () => {
+    // Smooth scroll to Features section
+    document.querySelector("#features")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-egalio-purple/10 via-egalio-teal/10 to-egalio-coral/10">
       <div className="absolute inset-0 w-full h-full bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"></div>
@@ -20,12 +43,14 @@ export const Hero = () => {
               <div className="flex space-x-2 justify-center">
                 <Button
                   className="bg-gradient-to-r from-egalio-purple to-egalio-teal text-white hover:opacity-90 transition-opacity"
+                  onClick={handleGetStarted}
                 >
                   Get Started
                 </Button>
                 <Button
                   variant="outline"
                   className="border-egalio-purple text-egalio-purple hover:bg-egalio-purple/10"
+                  onClick={handleLearnMore}
                 >
                   Learn More
                 </Button>
