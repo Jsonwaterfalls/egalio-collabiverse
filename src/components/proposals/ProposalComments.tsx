@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -82,7 +82,7 @@ export const ProposalComments = ({ proposalId }: { proposalId: string }) => {
     setLoading(false);
   };
 
-  useState(() => {
+  useEffect(() => {
     fetchComments();
 
     const channel = supabase
