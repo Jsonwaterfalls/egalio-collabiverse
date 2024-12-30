@@ -1,6 +1,7 @@
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { Communities } from "@/components/Communities";
+import { ProfileSection } from "@/components/ProfileSection";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +34,11 @@ const Index = () => {
         </Button>
       </div>
       <Hero />
+      <div className="py-16 bg-gradient-to-br from-egalio-purple/10 via-egalio-teal/10 to-egalio-coral/10">
+        <div className="container px-4 md:px-6">
+          <ProfileSection />
+        </div>
+      </div>
       <Features />
       <Communities />
     </div>
