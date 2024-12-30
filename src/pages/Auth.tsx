@@ -40,6 +40,16 @@ const AuthPage = () => {
           }}
           redirectTo="https://anarcho.live"
           providers={[]}
+          view="sign_in"
+          showLinks={true}
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: 'Email',
+                password_label: 'Password',
+              },
+            },
+          }}
         />
       </div>
     </div>
