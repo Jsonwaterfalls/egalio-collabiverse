@@ -146,6 +146,57 @@ export type Database = {
         }
         Relationships: []
       }
+      proposals: {
+        Row: {
+          community_id: string
+          created_at: string
+          created_by: string
+          deadline: string
+          description: string
+          id: string
+          status: string
+          title: string
+          votes_required: number
+        }
+        Insert: {
+          community_id: string
+          created_at?: string
+          created_by: string
+          deadline: string
+          description: string
+          id?: string
+          status?: string
+          title: string
+          votes_required?: number
+        }
+        Update: {
+          community_id?: string
+          created_at?: string
+          created_by?: string
+          deadline?: string
+          description?: string
+          id?: string
+          status?: string
+          title?: string
+          votes_required?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resource_ratings: {
         Row: {
           created_at: string
