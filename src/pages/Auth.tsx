@@ -48,9 +48,6 @@ const AuthPage = () => {
           }}
           redirectTo={window.location.origin}
           providers={[]}
-          onError={(error) => {
-            toast.error(error.message);
-          }}
           magicLink={false}
         />
       </div>
