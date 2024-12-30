@@ -2,6 +2,7 @@ import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { Communities } from "@/components/Communities";
 import { ProfileSection } from "@/components/ProfileSection";
+import { ResourceList } from "@/components/resources/ResourceList";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +42,11 @@ const Index = () => {
       </div>
       <Features />
       <Communities />
+      <div className="py-16 bg-white">
+        <div className="container px-4 md:px-6">
+          <ResourceList />
+        </div>
+      </div>
     </div>
   );
 };
