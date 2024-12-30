@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,35 +23,39 @@ export const Communities = () => {
   const fetchCommunities = async () => {
     const { data: user } = await supabase.auth.getUser();
     
-    const { data: communitiesData, error } = await supabase
+    // First, get all communities
+    const { data: communitiesData, error: communitiesError } = await supabase
       .from("communities")
-      .select(`
-        *,
-        community_members!inner (profile_id),
-        community_members!community_id (
-          profile_id
-        )
-      `)
-      .returns<any[]>();
+      .select("*");
 
-    if (error) {
+    if (communitiesError) {
       toast({
         title: "Error fetching communities",
-        description: error.message,
+        description: communitiesError.message,
         variant: "destructive",
       });
       return;
     }
 
-    const processedCommunities = communitiesData.map((community) => ({
-      ...community,
-      member_count: community.community_members?.length || 0,
-      is_member: community.community_members?.some(
-        (member: any) => member.profile_id === user.user?.id
-      ),
-    }));
+    // Then, for each community, get its members
+    const communitiesWithMembers = await Promise.all(
+      communitiesData.map(async (community) => {
+        const { data: members } = await supabase
+          .from("community_members")
+          .select("profile_id")
+          .eq("community_id", community.id);
 
-    setCommunities(processedCommunities);
+        return {
+          ...community,
+          member_count: members?.length || 0,
+          is_member: members?.some(
+            (member) => member.profile_id === user.user?.id
+          ) || false,
+        };
+      })
+    );
+
+    setCommunities(communitiesWithMembers);
     setLoading(false);
   };
 

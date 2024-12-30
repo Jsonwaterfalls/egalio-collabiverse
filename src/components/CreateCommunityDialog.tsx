@@ -21,10 +21,21 @@ export const CreateCommunityDialog = () => {
   const form = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to create a community",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { error } = await supabase.from("communities").insert({
       name: data.name,
       description: data.description,
       image_url: data.image_url,
+      created_by: user.user.id,
     });
 
     if (error) {
