@@ -3,6 +3,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -10,11 +11,18 @@ const AuthPage = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session) {
+        if (event === 'SIGNED_IN' && session) {
           navigate("/");
         }
       }
     );
+
+    // Check if user is already signed in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/");
+      }
+    });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
@@ -38,24 +46,12 @@ const AuthPage = () => {
               },
             },
           }}
-          redirectTo="https://anarcho.live"
+          redirectTo={window.location.origin}
           providers={[]}
-          magicLink={false}
-          showLinks={true}
-          localization={{
-            variables: {
-              sign_up: {
-                email_label: 'Email',
-                password_label: 'Password',
-                button_label: 'Sign up',
-              },
-              sign_in: {
-                email_label: 'Email',
-                password_label: 'Password',
-                button_label: 'Sign in',
-              },
-            },
+          onError={(error) => {
+            toast.error(error.message);
           }}
+          magicLink={false}
         />
       </div>
     </div>
