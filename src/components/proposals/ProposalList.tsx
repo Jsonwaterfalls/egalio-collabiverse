@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateProposalDialog } from "./CreateProposalDialog";
-import { ProposalVoting } from "./ProposalVoting";
-import { format } from "date-fns";
+import { ProposalCard } from "./ProposalCard";
 import { toast } from "sonner";
 
 type Proposal = {
@@ -15,10 +13,6 @@ type Proposal = {
   deadline: string;
   votes_required: number;
   created_by: string;
-};
-
-type Vote = {
-  vote_type: string;
 };
 
 export const ProposalList = ({ communityId }: { communityId: string }) => {
@@ -114,31 +108,13 @@ export const ProposalList = ({ communityId }: { communityId: string }) => {
         <h2 className="text-2xl font-bold">Proposals</h2>
         <CreateProposalDialog communityId={communityId} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {proposals.map((proposal) => (
-          <Card key={proposal.id}>
-            <CardHeader>
-              <CardTitle>{proposal.title}</CardTitle>
-              <div className="flex justify-between items-center text-sm text-muted-foreground">
-                <span>Status: {proposal.status}</span>
-                <span>
-                  Deadline: {format(new Date(proposal.deadline), "PPP")}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                {proposal.description}
-              </p>
-              <div className="text-sm text-muted-foreground mb-4">
-                Votes required: {proposal.votes_required}
-              </div>
-              <ProposalVoting
-                proposalId={proposal.id}
-                currentVote={userVotes[proposal.id]}
-              />
-            </CardContent>
-          </Card>
+          <ProposalCard
+            key={proposal.id}
+            proposal={proposal}
+            currentVote={userVotes[proposal.id]}
+          />
         ))}
       </div>
     </div>
