@@ -13,16 +13,20 @@ type CommunityCardProps = {
     is_member: boolean;
   };
   onJoinLeave: (communityId: string, isJoining: boolean) => Promise<void>;
+  onSelect: (communityId: string) => void;
 };
 
-export const CommunityCard = ({ community, onJoinLeave }: CommunityCardProps) => {
+export const CommunityCard = ({ community, onJoinLeave, onSelect }: CommunityCardProps) => {
   const navigate = useNavigate();
 
   return (
     <Card
       key={community.id}
       className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-      onClick={() => navigate(`/community/${community.id}`)}
+      onClick={() => {
+        onSelect(community.id);
+        navigate(`/community/${community.id}`);
+      }}
     >
       <div
         className="h-48 bg-cover bg-center"
