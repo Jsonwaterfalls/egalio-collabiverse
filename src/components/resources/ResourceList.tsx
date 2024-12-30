@@ -3,11 +3,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ResourceCard } from "./ResourceCard";
 import { CreateResourceDialog } from "./CreateResourceDialog";
+import { ResourceFilters } from "./ResourceFilters";
 
 export const ResourceList = () => {
   const [resources, setResources] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState("all");
+  const [priceRange, setPriceRange] = useState("all");
   const { toast } = useToast();
 
   const loadResources = async () => {
@@ -15,10 +19,27 @@ export const ResourceList = () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUserId(user?.id || null);
 
-      const { data, error } = await supabase
+      let query = supabase
         .from("resources")
         .select("*")
         .order("created_at", { ascending: false });
+
+      // Apply filters
+      if (searchQuery) {
+        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+      }
+
+      if (selectedType !== "all") {
+        query = query.eq("type", selectedType);
+      }
+
+      if (priceRange === "free") {
+        query = query.eq("price", 0);
+      } else if (priceRange === "paid") {
+        query = query.gt("price", 0);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setResources(data || []);
@@ -35,7 +56,9 @@ export const ResourceList = () => {
 
   useEffect(() => {
     loadResources();
+  }, [searchQuery, selectedType, priceRange]);
 
+  useEffect(() => {
     const channel = supabase
       .channel("resource-changes")
       .on(
@@ -70,15 +93,29 @@ export const ResourceList = () => {
         <h2 className="text-2xl font-bold">Resources</h2>
         <CreateResourceDialog onResourceCreated={loadResources} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {resources.map((resource) => (
-          <ResourceCard
-            key={resource.id}
-            resource={resource}
-            onDelete={handleDelete}
-            isOwner={userId === resource.author_id}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-1">
+          <ResourceFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
           />
-        ))}
+        </div>
+        <div className="lg:col-span-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {resources.map((resource) => (
+              <ResourceCard
+                key={resource.id}
+                resource={resource}
+                onDelete={handleDelete}
+                isOwner={userId === resource.author_id}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
